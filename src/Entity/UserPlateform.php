@@ -125,6 +125,9 @@ class UserPlateform implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user_plateform', targetEntity: UserObject::class)]
     private Collection $userObjects;
 
+    #[ORM\OneToMany(mappedBy: 'biker', targetEntity: InfoBiker::class)]
+    private Collection $infoBikers;
+
     public function __construct()
     {
 
@@ -133,6 +136,7 @@ class UserPlateform implements UserInterface, PasswordAuthenticatedUserInterface
         $this->status = false;
         $this->listMissionBikers = new ArrayCollection();
         $this->controlMissions = new ArrayCollection();
+        $this->infoBikers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -421,6 +425,36 @@ class UserPlateform implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($controlMission->getCTerrain() === $this) {
                 $controlMission->setCTerrain(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, InfoBiker>
+     */
+    public function getInfoBikers(): Collection
+    {
+        return $this->infoBikers;
+    }
+
+    public function addInfoBiker(InfoBiker $infoBiker): static
+    {
+        if (!$this->infoBikers->contains($infoBiker)) {
+            $this->infoBikers->add($infoBiker);
+            $infoBiker->setBiker($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInfoBiker(InfoBiker $infoBiker): static
+    {
+        if ($this->infoBikers->removeElement($infoBiker)) {
+            // set the owning side to null (unless already changed)
+            if ($infoBiker->getBiker() === $this) {
+                $infoBiker->setBiker(null);
             }
         }
 

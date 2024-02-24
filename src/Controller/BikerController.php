@@ -92,7 +92,7 @@ class BikerController extends AbstractController
         $this->em->flush();
 
         return new JsonResponse([
-            'message' => 'Success',
+            'message' => 'Success Create Mission',
         ], 201);
     }
 
@@ -149,10 +149,10 @@ class BikerController extends AbstractController
     {
 
         $mission_id =
-            $$request->get('mission_id');
+            $request->get('mission_id');
         $mission  = $this->em->getRepository(Mission::class)->findOneBy(['id' => $mission_id]);
         $keySecret =
-            $$request->get('keySecret');
+            $request->get('keySecret');
         $biker  = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' => $keySecret]);
         $missionBiker = $this->em->getRepository(ListMissionBiker::class)->findOneBy(['mission' => $mission, 'biker' => $biker]);
         if (!$missionBiker) {

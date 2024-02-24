@@ -19,7 +19,7 @@ class MissionSession
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date_created = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $date_end = null;
 
     #[ORM\OneToMany(mappedBy: 'missionsavebiker', targetEntity: PointLocalisation::class)]
@@ -29,8 +29,8 @@ class MissionSession
     private ?ListMissionBiker $missionbiker = null;
 
 
-    #[ORM\Column(nullable: true)] 
-     private ?\DateTimeInterface $startMission = null;
+    #[ORM\Column(nullable: true)]
+    private ?bool $startMission = null;
 
     #[ORM\Column(nullable: true)]
     private ?bool $endMission = null;

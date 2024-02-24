@@ -274,6 +274,7 @@ class AuthController extends AbstractController
             'email' => $user->getEmail() ?? '', 'phone' => $user->getPhone(),
             'status' => $user->isStatus(),
             'typeUser' => $user->getTypeUser()->getId(),
+            'infoComplete' => $user->getTypeUser()->getId() == 4 ? count($user->getInfoBikers()) != 0 : true,
             'profile' => $this->myFunction::BACK_END_URL . '/images/users/' . $profile,
 
 

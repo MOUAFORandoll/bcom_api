@@ -1,0 +1,201 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Facture{% endblock %}
+ 
+{% block body %}
+
+<style> 
+    body {
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        background-color: #f8f9fa; /* Bootstrap bg-light color */
+    }
+
+    .container {
+        margin-top: 20px;
+    }
+
+    .border-secondary {
+        border-color: #6c757d; /* Bootstrap border-secondary color */
+    }
+
+    .rounded {
+        border-radius: 0.25rem; /* Bootstrap border-radius */
+    }
+
+    .mt-3 {
+        margin-top: 1rem; /* Bootstrap margin-top */
+    }
+
+    .justify-content-between {
+        justify-content: space-between; /* Bootstrap justify-content-between */
+    }
+
+    .img-fluid {
+        max-width: 100%; /* Bootstrap responsive image */
+        height: auto;
+    }
+
+    .col-auto {
+        flex: 0 0 auto; /* Bootstrap col-auto */
+    }
+
+    .d-flex {
+        display: flex; /* Bootstrap display flex */
+    }
+
+    .align-items-center {
+        align-items: center; /* Bootstrap align-items-center */
+    }
+
+    .justify-content-center {
+        justify-content: center; /* Bootstrap justify-content-center */
+    }
+
+    .text-center {
+        text-align: center; /* Bootstrap text-center */
+    }
+
+    .bg-dark {
+        background-color: #343a40; /* Bootstrap bg-dark color */
+    }
+
+    .text-white {
+        color: #fff; /* Bootstrap text-white color */
+    }
+
+    .p-1 {
+        padding: 0.25rem; /* Bootstrap padding */
+    }
+
+    .mb-0 {
+        margin-bottom: 0; /* Bootstrap margin-bottom */
+    }
+
+    .mt-5 {
+        margin-top: 3rem; /* Bootstrap margin-top */
+    }
+
+    .mb-4 {
+        margin-bottom: 1.5rem; /* Bootstrap margin-bottom */
+    }
+
+    .fw-bold {
+        font-weight: bold; /* Bootstrap font-weight-bold */
+    }
+
+    .fs-6 {
+        font-size: 1rem; /* Bootstrap font-size */
+    }
+
+    .mb-3 {
+        margin-bottom: 1rem; /* Bootstrap margin-bottom */
+    }
+
+    .col-4 {
+        flex: 0 0 33.333333%; /* Bootstrap col-4 */
+        max-width: 33.333333%;
+    }
+
+    .col-8 {
+        flex: 0 0 66.666667%; /* Bootstrap col-8 */
+        max-width: 66.666667%;
+    }
+
+    .text-secondary {
+        color: #6c757d; /* Bootstrap text-secondary color */
+    } 
+</style> 
+    <div class="container border border-secondary rounded mt-3">
+        <div class="row justify-content-between mt-3">
+            <div class="col">
+                <img
+                    src="{{ asset('images/default/fd.jpg') }}"
+                    alt="Votre Logo"
+                    class="img-fluid"
+                    width="100"
+                />
+            </div>
+
+            <div class="col-auto">
+                <div class="mx-auto align-items-center d-flex justify-content-center">
+                    <div
+                        class="text-center d-inline-block fw-bold fs-6 bg-dark p-1 text-white border border-secondary rounded"
+                    >
+                        Contact
+                    </div>
+                </div>
+
+                <p class="mb-0">
+                    Douala : 69090909 Yaounde : 69090909 Bafoussam : 69090909
+                </p>
+            </div>
+        </div>
+
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col">
+                    <h4>Initiateur de Livraison</h4>
+                </div>
+                <div class="col">
+                    <h4>Informations du Colis</h4>
+                </div>
+                <div class="col">
+                    <h4>Informations de Livraison</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="mb-3">
+                        <div class="col-4">Nom</div>
+                        <div class="col-8 fw-bold fs-5">{{ initiateur.nom }}</div>
+                    </div>
+                    <div>
+                        <div class="col-4">Téléphone</div>
+                        <div class="col-8 fw-bold fs-5">{{ initiateur.phone }}</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="mb-3">
+                        <div class="col-4">Nom du Colis</div>
+                        <div class="col-8 fw-bold fs-5">{{ colis.nom }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="col-4">Quantité</div>
+                        <div class="col-8 fw-bold fs-5">{{ colis.quantite }}</div>
+                    </div>
+                    <div>
+                        <div class="col-4">Valeur du Colis</div>
+                        <div class="col-8 fw-bold fs-5">{{ colis.valeur }}</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="mb-3">
+                        <div class="col-4">Ville</div>
+                        <div class="col-8 fw-bold fs-5">{{ livraison.ville }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="col-4">Lieu de Départ</div>
+                        <div class="col-8 fw-bold fs-5">{{ livraison.lieuDepart }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="col-4">Lieu d'Arrivée</div>
+                        <div class="col-8 fw-bold fs-5">{{ livraison.lieuArrivee }}</div>
+                    </div>
+                    <div>
+                        <div class="col-4">Montant de Livraison</div>
+                        <div class="col-8 fw-bold fs-5">{{ livraison.montant }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="qrcode text-center mt-3">
+            <!-- Code QR ici -->
+            <!-- Vous pouvez ajouter le code QR en fonction de votre implémentation -->
+        </div>
+    </div>
+{% endblock %}

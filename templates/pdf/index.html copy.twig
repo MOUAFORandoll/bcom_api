@@ -1,0 +1,140 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Facture{% endblock %}
+
+{% block body %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .invoice {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px;
+        }
+
+        .column {
+            flex: 1;
+            padding: 10px;
+        }
+
+        h2 {
+            color: #0077c2;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #0077c2;
+            color: #fff;
+        }
+
+        .total {
+            font-weight: bold;
+        }
+
+        .qrcode {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+
+    <div class="example-wrapper">
+        <table>
+            <tr>
+                <td>
+                <td>
+                    <div class="invoice">
+                        <div class="column">
+                            <h2>Initiateur de Livraison</h2>
+                            <table>
+                                <tr>
+                                    <th>Nom</th>
+                                    <td>{{ initiateur.nom }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Téléphone</th>
+                                    <td>{{ initiateur.phone }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            
+            <tr>
+                <td>
+                    <div class="invoice">
+                        <div class="column">
+                            <h2>Informations du Colis</h2>
+                            <table>
+                                <tr>
+                                    <th>Nom du Colis</th>
+                                    <td>{{ colis.nom }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Quantité</th>
+                                    <td>{{ colis.quantite }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Valeur</th>
+                                    <td>{{ colis.valeur }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            
+            <tr>
+                <td>
+                    <div class="invoice">
+                        <div class="column">
+                            <h2>Informations de Livraison</h2>
+                            <table>
+                                <tr>
+                                    <th>Ville</th>
+                                    <td>{{ livraison.ville }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Lieu de Départ</th>
+                                    <td>{{ livraison.lieuDepart }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Lieu d'Arrivée</th>
+                                    <td>{{ livraison.lieuArrivee }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Montant de Livraison</th>
+                                    <td>{{ livraison.montant }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="qrcode">
+            <!-- Code QR ici -->
+            <!-- Vous pouvez ajouter le code QR en fonction de votre implémentation -->
+        </div>
+    </div>
+{% endblock %}

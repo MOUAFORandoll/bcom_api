@@ -1,0 +1,38 @@
+
+###> symfony/framework-bundle ###
+/.env
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+/migrations/*.php
+###< symfony/framework-bundle ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###
+
+###> symfony/phpunit-bridge ###
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###
+
+###> lexik/jwt-authentication-bundle ###
+# /config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
+
+###> symfony/webpack-encore-bundle ###
+/node_modules/
+/emiy_socket_server/node_modules/ 
+/emiy_stream_server/node_modules/ 
+/emiy_stream_server/video/ 
+/public/bundles/
+/public/factures/
+/public/images/
+/public/videos/
+npm-debug.log
+yarn-error.log
+###< symfony/webpack-encore-bundle ###

@@ -111,11 +111,12 @@ class AuthController extends AbstractController
                 'message' => 'Ce client n\'existe pas'
             ], 203);
         }
-        if ($user->getTypeUser()->getId() != 1 || $user->getTypeUser()->getId() != 2) {
+        if ($user->getTypeUser()->getId() != 1 && $user->getTypeUser()->getId() != 2) {
             return new JsonResponse([
                 'message' => 'Ce client n\'est pas administrateur'
             ], 203);
         }
+
 
 
         if (!password_verify($password, $user->getPassword())) {

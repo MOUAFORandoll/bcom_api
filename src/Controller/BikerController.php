@@ -93,6 +93,7 @@ class BikerController extends AbstractController
 
         return new JsonResponse([
             'message' => 'Success Create Mission',
+            'missionsession_id' => $ms->getId()
         ], 201);
     }
 
@@ -216,25 +217,27 @@ class BikerController extends AbstractController
     {
 
 
+        $keySecret =
+            $request->get('keySecret');
+        $biker  = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' => $keySecret]);
+        $missionBiker = $this->em->getRepository(ListMissionBiker::class)->findBy(['biker' => $biker]);
+        if (!$missionBiker) {
+            return new JsonResponse([
+                'message' => 'Une erreur est survenue',
+            ], 203);
+        }
 
-        // if (empty($dataRequest['keySecretCTerrain']) || empty($dataRequest['keySecret'])) {
+        return new JsonResponse(
+            [
+                'data'
+                =>
+                array_map(function (ListMissionBiker $da) {
 
-        //     return new JsonResponse([
-        //         'message' => 'Veuillez preciser votre numero de telephone ou votre adresse mail et le code'
-        //     ], 203);
-        // }
-        // $keySecret =
-        //     $dataRequest['keySecret'];
-        // $user = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' => $keySecret]);
+                    return   $this->myFunction->formatMissionForUser($da);
+                },  $missionBiker)
 
-        // $typeUser = $this->em->getRepository(TypeUser::class)->findOneBy(['id' => 3]);
-        // $user->setTypeUser($typeUser);
-
-        // $this->em->persist($user);
-        // $this->em->flush();
-
-        return new JsonResponse([
-            'message' => 'Success',
-        ], 201);
+            ],
+            200
+        );
     }
 }

@@ -190,6 +190,7 @@ class MyFunction
 
             'date_end' => $da->getDateEnd() == null ? null :
                 date_format($da->getDateEnd(), 'Y-m-d H:i'),
+            'end_mission' => $da->isEndMission(),
 
 
         ];

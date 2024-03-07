@@ -55,6 +55,15 @@ class InfoBiker
     #[ORM\ManyToOne(inversedBy: 'infoBikers')]
     private ?UserPlateform $biker = null;
 
+    #[ORM\ManyToOne(inversedBy: 'infoBikers')]
+    private ?ObjectFile $cniAvant = null;
+
+    #[ORM\ManyToOne(inversedBy: 'infoBikers')]
+    private ?ObjectFile $cniArriere = null;
+
+    #[ORM\ManyToOne(inversedBy: 'infoBikers')]
+    private ?ObjectFile $carteGrise = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -223,6 +232,42 @@ class InfoBiker
     public function setBiker(?UserPlateform $biker): static
     {
         $this->biker = $biker;
+
+        return $this;
+    }
+
+    public function getCniAvant(): ?ObjectFile
+    {
+        return $this->cniAvant;
+    }
+
+    public function setCniAvant(?ObjectFile $cniAvant): static
+    {
+        $this->cniAvant = $cniAvant;
+
+        return $this;
+    }
+
+    public function getCniArriere(): ?ObjectFile
+    {
+        return $this->cniArriere;
+    }
+
+    public function setCniArriere(?ObjectFile $cniArriere): static
+    {
+        $this->cniArriere = $cniArriere;
+
+        return $this;
+    }
+
+    public function getCarteGrise(): ?ObjectFile
+    {
+        return $this->carteGrise;
+    }
+
+    public function setCarteGrise(?ObjectFile $carteGrise): static
+    {
+        $this->carteGrise = $carteGrise;
 
         return $this;
     }

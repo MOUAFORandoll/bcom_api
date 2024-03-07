@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\ControlMission;
 use App\Entity\MedicamentPharmacie;
+use App\Entity\UserPlateform;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -80,7 +81,35 @@ class CTerrainController extends AbstractController
 
         $cmission = $this->em->getRepository(ControlMission::class)->findOneBy(['id' =>  $dataRequest['idControl']]);
 
-        $cmission->setDateStart(new \DateTime());
+        $cmission->setDateEnd(new \DateTime());
+        $cmission->setStatus(1);
+        $this->em->persist($cmission);
+        $this->em->flush();
+
+
+
+        return new JsonResponse([
+            'message' => 'Success',
+        ], 201);
+    }
+
+    #[Route('/cterrain/note-biker', name: 'NoteBiker', methods: ['POST'])]
+    public function
+    NoteBiker(Request $request)
+    {
+        $dataRequest = $request->toArray();
+
+        if (empty($dataRequest['idControl'])) {
+
+            return new JsonResponse([
+                'message' => 'Veuillez reessayer'
+            ], 203);
+        }
+
+
+        $cmission = $this->em->getRepository(ControlMission::class)->findOneBy(['id' =>  $dataRequest['idControl']]);
+
+        $cmission->setNote(new \DateTime());
         $this->em->persist($cmission);
         $this->em->flush();
 
@@ -96,29 +125,24 @@ class CTerrainController extends AbstractController
     public function
     ListMissionCTerrain(Request $request)
     {
+        if (empty($dataRequest['keySecretCterrain'])) {
 
-        $dataRequest = $request->toArray();
+            return new JsonResponse([
+                'message' => 'Veuillez reessayer'
+            ], 203);
+        }
+        $Cterrain = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' =>  $dataRequest['keySecretCterrain']]);
 
-
-        // if (empty($dataRequest['keySecretCTerrain']) || empty($dataRequest['keySecret'])) {
-
-        //     return new JsonResponse([
-        //         'message' => 'Veuillez preciser votre numero de telephone ou votre adresse mail et le code'
-        //     ], 203);
-        // }
-        // $keySecret =
-        //     $dataRequest['keySecret'];
-        // $user = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' => $keySecret]);
-
-        // $typeUser = $this->em->getRepository(TypeUser::class)->findOneBy(['id' => 3]);
-        // $user->setTypeUser($typeUser);
-
-        // $this->em->persist($user);
-        // $this->em->flush();
+        $cmission = $this->em->getRepository(ControlMission::class)->findBy(['Cterrain' => $Cterrain, 'dateStart' => null, 'dateEnd' => null, 'status' => 0]);
 
         return new JsonResponse([
-            'message' => 'Success',
-        ], 201);
+            'data' =>
+
+            array_map(function (ControlMission $da) {
+
+                return   $this->myFunction->formatMissionControl($da);
+            }, $cmission)
+        ], 200);
     }
 
 
@@ -127,27 +151,22 @@ class CTerrainController extends AbstractController
     ListMissionCTerrainDone(Request $request)
     {
 
-        $dataRequest = $request->toArray();
+        if (empty($dataRequest['keySecretCterrain'])) {
 
+            return new JsonResponse([
+                'message' => 'Veuillez reessayer'
+            ], 203);
+        }
+        $Cterrain = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' =>  $dataRequest['keySecretCterrain']]);
 
-        // if (empty($dataRequest['keySecretCTerrain']) || empty($dataRequest['keySecret'])) {
-
-        //     return new JsonResponse([
-        //         'message' => 'Veuillez preciser votre numero de telephone ou votre adresse mail et le code'
-        //     ], 203);
-        // }
-        // $keySecret =
-        //     $dataRequest['keySecret'];
-        // $user = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' => $keySecret]);
-
-        // $typeUser = $this->em->getRepository(TypeUser::class)->findOneBy(['id' => 3]);
-        // $user->setTypeUser($typeUser);
-
-        // $this->em->persist($user);
-        // $this->em->flush();
+        $cmission = $this->em->getRepository(ControlMission::class)->findBy(['Cterrain' => $Cterrain,  'status' => 1]);
 
         return new JsonResponse([
-            'message' => 'Success',
-        ], 201);
+            'data'
+            =>    array_map(function (ControlMission $da) {
+
+                return   $this->myFunction->formatMissionControl($da);
+            }, $cmission)
+        ], 200);
     }
 }

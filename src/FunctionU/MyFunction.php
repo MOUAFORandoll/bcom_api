@@ -3,6 +3,7 @@
 namespace App\FunctionU;
 
 use App\Entity\ColisObject;
+use App\Entity\ControlMission;
 use App\Entity\ListMissionBiker;
 use App\Entity\Livraison;
 use App\Entity\LivraisonKey;
@@ -10,6 +11,7 @@ use App\Entity\LivraisonOrdonnanceKey;
 use App\Entity\Medicament;
 use App\Entity\Mission;
 use App\Entity\MissionSession;
+use App\Entity\ObjectFile;
 use App\Entity\Ordonnance;
 use App\Entity\Pharmacie;
 use App\Entity\UserObject;
@@ -45,7 +47,7 @@ class MyFunction
 
     const
         BACK_END_URL =
-        'https://redirections-medicasure.medsurlink.com';
+        'https://api.bcom.cm';
 
     // BACK_END_URL =
     // 'http://192.168.43.134:8000';
@@ -145,6 +147,43 @@ class MyFunction
             return $chaine;
         }
     }
+
+    public function getUniqueNamCni()
+    {
+
+
+        $chaine = 'cni_biker';
+        $listeCar = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $max = mb_strlen($listeCar, '8bit') - 1;
+        for ($i = 0; $i < 5; ++$i) {
+            $chaine .= $listeCar[random_int(0, $max)];
+        }
+        $ExistCode = $this->em->getRepository(ObjectFile::class)->findOneBy(['src' => $chaine . 'jpg']);
+        if ($ExistCode) {
+            return
+                $this->getUniqueNamUserName();
+        } else {
+            return $chaine;
+        }
+    }
+    public function getUniqueNamCGrise()
+    {
+
+
+        $chaine = 'c_grise_biker';
+        $listeCar = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $max = mb_strlen($listeCar, '8bit') - 1;
+        for ($i = 0; $i < 5; ++$i) {
+            $chaine .= $listeCar[random_int(0, $max)];
+        }
+        $ExistCode = $this->em->getRepository(ObjectFile::class)->findOneBy(['src' => $chaine . 'jpg']);
+        if ($ExistCode) {
+            return
+                $this->getUniqueNamUserName();
+        } else {
+            return $chaine;
+        }
+    }
     function formatMission(Mission $da)
     {
 
@@ -173,8 +212,36 @@ class MyFunction
 
             'description' => $da->getMission()->getDescription(),
             'nbre_point' => $da->getMission()->getNbrePoint(),
-            'status' => $da->getMission()->isStatus(),
+            'status' => $da->isStatus(),
             'nbre_session' => count($da->getMissionSessions()),
+
+        ];
+    }
+    function formatBiker(UserPlateform $da)
+    {
+
+        return  [
+
+            'id' => $da->getId(),
+            'name' => $da->getNomComplet(),
+
+            'image' => '',
+            'phone' =>  $da->getPhone(),
+
+        ];
+    }
+    function formatMissionControl(ControlMission $da)
+    {
+
+        return  [
+
+            'id' => $da->getId(),
+            'note' => $da->getNote(),
+            'mission' => $this->formatMissionForUser($da->getBikerMission()->getMissionbiker()),
+            'biker' => $this->formatBiker($da->getBikerMission()->getMissionbiker()->getBiker()),
+            'date_created' =>
+            date_format($da->getDateCreated(), 'Y-m-d H:i'),
+            'biker_position' => $da->getBikerMission()->getMissionbiker()->getMissionSessions()->last()->getPointLocalisations(),
 
         ];
     }
@@ -191,6 +258,24 @@ class MyFunction
             'date_end' => $da->getDateEnd() == null ? null :
                 date_format($da->getDateEnd(), 'Y-m-d H:i'),
             'end_mission' => $da->isEndMission(),
+
+        ];
+    }
+    function formatMissionSessionN(MissionSession $da)
+    {
+
+        return  [
+
+            'id' => $da->getId(),
+
+            'date_start' =>
+            date_format($da->getDateCreated(), 'Y-m-d H:i'),
+
+            'date_end' => $da->getDateEnd() == null ? null :
+                date_format($da->getDateEnd(), 'Y-m-d H:i'),
+            'end_mission' => $da->isEndMission(),
+            'biker' => $this->formatBiker($da->getControlMissions()->last()->getMissionbiker()->getBiker()),
+
 
 
         ];

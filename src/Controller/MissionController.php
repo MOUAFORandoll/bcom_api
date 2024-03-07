@@ -90,6 +90,67 @@ class MissionController extends AbstractController
             'message' => 'Success',
         ], 201);
     }
+
+    #[Route('/missions', name: 'UpdateMission', methods: ['PATCH'])]
+    public function
+    UpdateMission(Request $request)
+    {
+
+        $dataRequest = $request->toArray();
+        $libelle =
+            $dataRequest['libelle'];
+        $description =
+            $dataRequest['description'];
+        $nbre_point =
+            $dataRequest['nbre_point'];
+
+
+        $missionId =
+            $dataRequest['missionId'];
+
+        $mission = $this->em->getRepository(Mission::class)->find($missionId);
+        $mission->setLibelle($libelle ?? $mission->getLibelle());
+        $mission->setDescription($description ?? $mission->getDescription());
+        $mission->setNbrePoint($nbre_point ?? $mission->getNbrePoint());
+
+        if (!$mission) {
+            return new JsonResponse([
+                'message' => 'Mission introuvable',
+            ], 203);
+        }
+        $this->em->persist($mission);
+        $this->em->flush();
+        return new JsonResponse([
+            'message' => 'Success',
+        ], 201);
+    }
+
+
+    #[Route('/missions/status', name: 'ChangeStatusMission', methods: ['POST'])]
+    public function
+    ChangeStatusMission(Request $request)
+    {
+
+        $dataRequest = $request->toArray();
+        $missionId =
+            $dataRequest['missionId'];
+
+        $mission = $this->em->getRepository(Mission::class)->find($missionId);
+        $mission->setStatus(
+            !$mission->isStatus()
+        );
+        if (!$mission) {
+            return new JsonResponse([
+                'message' => 'Mission introuvable',
+            ], 203);
+        }
+
+        $this->em->persist($mission);
+        $this->em->flush();
+        return new JsonResponse([
+            'message' => 'Success',
+        ], 201);
+    }
     #[Route('/missions', name: 'ReadMission', methods: ['GET'])]
     public function
     ReadMission(Request $request)

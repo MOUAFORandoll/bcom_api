@@ -22,7 +22,7 @@ class ControlMission
     private ?UserPlateform $CBureau = null;
 
     #[ORM\Column]
-    private ?bool $status = null;
+    private ?int $status = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateStart = null;
@@ -35,12 +35,13 @@ class ControlMission
 
     #[ORM\Column(nullable: true)]
     private ?float $note = null;
+    #[ORM\Column(type: "date")]
+    private $date_created;
     public function __construct()
     {
+        $this->date_created = new \DateTime();
 
-
-
-        $this->status = true;
+        $this->status = 0;
     }
     public function getId(): ?int
     {
@@ -72,12 +73,12 @@ class ControlMission
         return $this;
     }
 
-    public function isStatus(): ?bool
+    public function isStatus(): ?int
     {
         return $this->status;
     }
 
-    public function setStatus(bool $status): static
+    public function setStatus(int $status): static
     {
         $this->status = $status;
 
@@ -120,6 +121,17 @@ class ControlMission
         return $this;
     }
 
+    public function getDateCreated(): ?\DateTimeInterface
+    {
+        return $this->date_created;
+    }
+
+    public function setDateCreated(\DateTimeInterface $date_created): self
+    {
+        $this->date_created = $date_created;
+
+        return $this;
+    }
     public function getNote(): ?float
     {
         return $this->note;

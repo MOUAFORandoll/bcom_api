@@ -108,7 +108,7 @@ class BikerController extends AbstractController
         $ms = $this->em->getRepository(MissionSession::class)->find($missionSession);
 
         $ms->setEndMission(true);
-        
+
         $ms->setDateEnd(new DateTime());
         $this->em->persist($ms);
         $this->em->flush();

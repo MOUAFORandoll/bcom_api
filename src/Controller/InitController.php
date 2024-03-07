@@ -45,7 +45,7 @@ class InitController extends AbstractController
     public function createFileRepertory()
     {
         $basePath = $this->publicDirectory;
-        $subDirs = ['images', 'images/users']; // Exemple de sous-dossiers
+        $subDirs = ['images', 'images/users', 'images/biker_object']; // Exemple de sous-dossiers
 
         foreach ($subDirs as $subDir) {
             $fullPath = $basePath . '/' . $subDir;

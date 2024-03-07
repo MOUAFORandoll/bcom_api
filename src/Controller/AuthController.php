@@ -249,6 +249,81 @@ class AuthController extends AbstractController
             'refreshToken' => $tokenAndRefresh->refreshToken,
         ], 201);
     }
+
+    /**
+     * @Route("/cbureau", name="createUsercbureau", methods={"POST"})
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function createUsercbureau(Request $request)
+    {
+        $data = $request->toArray();
+
+
+        if (empty($data['nom']) || empty($data['phone'])   || empty($data['password'])) {
+
+            return new JsonResponse([
+                'message' => 'Veuillez preciser votre nom, prenom, numero de telephone et mot de passe.'
+            ], 203);
+        }
+
+        $nom = $data['nom'];
+        $phone = $data['phone'];
+        $password = $data['password'];
+
+
+        $user = $this->em->getRepository(UserPlateform::class)->findOneBy(['phone' => $phone]);
+
+
+        if ($user) {
+            return new JsonResponse([
+                'message' => 'Numero de telephone deja utilise'
+            ], 203);
+        }
+        $otherNumber = [];
+
+        for ($i = 0; $i < 4; $i++) {
+            try {
+                $otherNumber[] = random_int(0, 9);
+            } catch (\Exception $e) {
+                echo $e;
+            }
+        }
+
+        $keySecret = password_hash(($phone . '' . $password . '' . (new \DateTime())->format('Y-m-d H:i:s') . '' . implode("", $otherNumber)), PASSWORD_DEFAULT);
+
+        if (strlen($keySecret) > 100) {
+            $keySecret = substr($keySecret, 0, 99);
+        }
+
+
+        $user = new UserPlateform();
+        $user->setNom($nom);
+        $user->setPrenom('');
+
+        $user->setPhone($phone);
+        $user->setPassword($password);
+
+        $user->setKeySecret($keySecret);
+        $typeUser = $this->em->getRepository(TypeUser::class)->findOneBy(['id' => 2]);
+        $user->setTypeUser($typeUser);
+
+        $passwordN = $this->passwordEncoder->hashPassword(
+            $user,
+            $password
+        );
+        $user->setPassword($passwordN);
+        $this->em->persist($user);
+        $this->em->flush();
+        $infoUser = $this->createNewJWT($user);
+        $tokenAndRefresh = json_decode($infoUser->getContent());
+
+        return new JsonResponse([
+            'user' => $user,
+            'token' => $tokenAndRefresh->token,
+            'refreshToken' => $tokenAndRefresh->refreshToken,
+        ], 201);
+    }
     /**
      * @Route("/user/get", name="getUserX", methods={"GET"})
      * @param Request $request

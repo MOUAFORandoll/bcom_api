@@ -198,6 +198,30 @@ class CBureauController extends AbstractController
             'message' => 'Success',
         ], 201);
     }
+
+
+    #[Route('/cbureau/list-mission-session', name: 'ListMissionSession', methods: ['GET'])]
+    public function
+    ListMissionSession(Request $request)
+    {
+        // if (empty($dataRequest['keySecretCterrain'])) {
+
+        //     return new JsonResponse([
+        //         'message' => 'Veuillez reessayer'
+        //     ], 203);
+        // }
+        $missionSave = $this->em->getRepository(MissionSession::class)->findBy(['endMission' => false]);
+
+        return new JsonResponse([
+            'data' =>
+
+            array_map(function (MissionSession $da) {
+
+                return   $this->myFunction->formatMissionSessionN($da);
+            }, $missionSave)
+        ], 200);
+    }
+
     #[Route('/cbureau/annul-control', name: 'AnnulControlBiker', methods: ['POST'])]
     public function
     AnnulControlBiker(Request $request)

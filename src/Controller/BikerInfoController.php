@@ -41,6 +41,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Knp\Component\Pager\PaginatorInterface;
 
 use App\Entity\InfoBiker;
+use App\Entity\ObjectFile;
 use App\Repository\InfoBikerRepository;
 
 class BikerInfoController extends AbstractController
@@ -83,9 +84,28 @@ class BikerInfoController extends AbstractController
     }
 
     #[Route('/info-biker', name: 'info_biker_create', methods: ['POST'])]
-    public function create(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    public function create(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
+
+
+        $data = [
+            'gender' => $request->get('gender'),
+            'age' => $request->get('age'),
+            'cni' => $request->get('cni'),
+            'handicap' => $request->get('handicap'),
+            'handicap_description' => $request->get('handicap_description'),
+            'is_biker' => $request->get('is_biker'),
+            'is_biker_yes' => $request->get('is_biker_yes'),
+            'is_biker_no' => $request->get('is_biker_no'),
+            'is_syndicat' => $request->get('is_syndicat'),
+            'is_syndicat_yes' => $request->get('is_syndicat_yes'),
+            'have_moto' => $request->get('have_moto'),
+            'num_carte_grise_moto' => $request->get('num_carte_grise_moto'),
+            'bike_work_time' => $request->get('bike_work_time'),
+            'keySecret' => $request->get('keySecret'),
+
+        ];
+
 
         $user = $entityManager->getRepository(UserPlateform::class)->findOneBy(['keySecret' => $data['keySecret']]);
 
@@ -113,11 +133,29 @@ class BikerInfoController extends AbstractController
         $infoBiker->setBiker($user);
 
 
+
+        $cni_avant = $request->files->get('cni_avant');
+        if ($cni_avant != null) {
+            $idCniA =     $this->updateFile(0,   $cni_avant, $slugger);
+            $infoBiker->setCniAvant($idCniA);
+        }
+
+        $cni_arriere = $request->files->get('cni_arriere');
+        if ($cni_arriere != null) {
+
+            $idCniAr =     $this->updateFile(1,   $cni_arriere, $slugger);
+            $infoBiker->setCniArriere($idCniAr);
+        }
+
+        $carte_grise = $request->files->get('carte_grise');
+        if ($carte_grise != null) {
+            $idCG =     $this->updateFile(2,   $carte_grise, $slugger);
+            $infoBiker->setCarteGrise($idCG);
+        }
         $entityManager->persist($infoBiker);
         $entityManager->flush();
 
         $profile      = count($user->getUserObjects())  == 0 ? '' : $user->getUserObjects()->last()->getSrc();
-        // $user->getUserObjects()[count($user->getUserObjects()) - 1]->getSrc();
         $userU = [
             'id' => $user->getId(),
             'nom' => $user->getNom(), 'prenom' => $user->getPrenom(),
@@ -129,25 +167,75 @@ class BikerInfoController extends AbstractController
 
 
             'date_created' => date_format($user->getDateCreated(), 'Y-m-d H:i'),
-            // 'localisation' =>    $localisation  ? [
-            //     'ville' =>
-            //     $localisation->getVille(),
 
-            //     'longitude' =>
-            //     $localisation->getLongitude(),
-            //     'latitude' =>
-            //     $localisation->getLatitude(),
-            // ] : []
-            // 'nom' => $user->getNom()
         ];
 
 
-
         return new JsonResponse([
-            // 'status' => 'ok',
+
             'data' =>  $userU,
 
         ], 201);
+    }
+    public function updateFile($type, $file, $slugger)
+    {
+        $object = null;
+        if ($type == 0) {
+            $originalFilenameData = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+
+            $newFilenameData =
+                $this->myFunction->getUniqueNamCni() .  '.' . $file->guessExtension();
+
+            $file->move(
+                $this->getParameter('biker_object'),
+                $newFilenameData
+            );
+            $object = new ObjectFile();
+
+            $object->setSrc($newFilenameData);
+
+            $this->em->persist($object);
+            $this->em->flush();
+        }
+        if ($type == 1) {
+            $originalFilenameData = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeFilenameData = $slugger->slug($originalFilenameData);
+            $newFilenameData =
+                $this->myFunction->getUniqueNamCni() .  '.' . $file->guessExtension();
+
+            $file->move(
+                $this->getParameter('biker_object'),
+                $newFilenameData
+            );
+            $object = new ObjectFile();
+
+            $object->setSrc($newFilenameData);
+
+            $this->em->persist($object);
+            $this->em->flush();
+        }
+        if ($type == 2) {
+
+            $originalFilenameData = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+
+            $safeFilenameData = $slugger->slug($originalFilenameData);
+            $newFilenameData =
+                $this->myFunction->getUniqueNamCGrise() .  '.' . $file->guessExtension();
+
+            $file->move(
+                $this->getParameter('biker_object'),
+                $newFilenameData
+            );
+            $object = new ObjectFile();
+
+            $object->setSrc($newFilenameData);
+
+            $this->em->persist($object);
+            $this->em->flush();
+        }
+
+        return
+            $object;
     }
 
     #[Route('/info-biker/{id}', name: 'info_biker_update', methods: ['PUT'])]

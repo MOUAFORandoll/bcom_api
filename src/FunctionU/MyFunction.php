@@ -217,7 +217,7 @@ class MyFunction
 
         ];
     }
-    function formatBiker(UserPlateform $da)
+    function formatBikerOrController(UserPlateform $da)
     {
 
         return  [
@@ -236,13 +236,17 @@ class MyFunction
         return  [
 
             'id' => $da->getId(),
+            'status' => $da->isStatus(),
             'note' => $da->getNote(),
             'mission' => $this->formatMissionForUser($da->getBikerMission()->getMissionbiker()),
-            'biker' => $this->formatBiker($da->getBikerMission()->getMissionbiker()->getBiker()),
+            'biker' => $this->formatBikerOrController($da->getBikerMission()->getMissionbiker()->getBiker()),
+            'controller' => $this->formatBikerOrController($da->getCTerrain()),
             'date_created' =>
             date_format($da->getDateCreated(), 'Y-m-d H:i'),
             'biker_position' => $da->getBikerMission()->getMissionbiker()->getMissionSessions()->last()->getPointLocalisations(),
-
+            'date_end' => $da->getDateEnd() == null ? null :
+                date_format($da->getDateEnd(), 'Y-m-d H:i'),   'date_start' => $da->getDateStart() == null ? null :
+                date_format($da->getDateStart(), 'Y-m-d H:i'),
         ];
     }
     function formatMissionSession(MissionSession $da)
@@ -270,11 +274,13 @@ class MyFunction
 
             'date_start' =>
             date_format($da->getDateCreated(), 'Y-m-d H:i'),
+            'status' => $da->getMissionbiker()->isStatus(),
+            'mission' => $this->formatMissionForUser($da->getMissionbiker()),
 
             'date_end' => $da->getDateEnd() == null ? null :
                 date_format($da->getDateEnd(), 'Y-m-d H:i'),
             'end_mission' => $da->isEndMission(),
-            'biker' => $this->formatBiker($da->getControlMissions()->last()->getMissionbiker()->getBiker()),
+            'biker' => $this->formatBikerOrController($da->getMissionbiker()->getBiker()),
 
 
 

@@ -183,7 +183,7 @@ class CBureauController extends AbstractController
 
         $Cbureau = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' =>  $dataRequest['keySecretCbureau']]);
         $Cterrain = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' =>  $dataRequest['keySecretCterrain']]);
-        $missionSave = $this->em->getRepository(MissionSession::class)->findOneBy(['keySecret' =>  $dataRequest['idMissionSession']]);
+        $missionSave = $this->em->getRepository(MissionSession::class)->findOneBy(['id' =>  $dataRequest['idMissionSession']]);
 
         $cmission = new ControlMission();
         $cmission->setCTerrain($Cterrain);
@@ -283,7 +283,11 @@ class CBureauController extends AbstractController
 
         return new JsonResponse([
             'data' =>
-            $cmission,
+
+            array_map(function (ControlMission $da) {
+
+                return   $this->myFunction->formatMissionControl($da);
+            }, $cmission)
         ], 201);
     }
     #[Route('/cbureau/list-control-done', name: 'ListMissionCBureauDone', methods: ['GET'])]

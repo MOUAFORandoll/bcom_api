@@ -54,10 +54,11 @@ class CTerrainController extends AbstractController
         }
 
 
-        $cmission = $this->em->getRepository(ControlMission::class)->findOneBy(['id' =>  $dataRequest['idControl']]);
+        $control_mission = $this->em->getRepository(ControlMission::class)->findOneBy(['id' =>  $dataRequest['idControl']]);
 
-        $cmission->setDateStart(new \DateTime());
-        $this->em->persist($cmission);
+        $control_mission->setDateStart(new \DateTime());
+        $control_mission->setStatus(1);
+        $this->em->persist($control_mission);
         $this->em->flush();
 
 
@@ -79,11 +80,11 @@ class CTerrainController extends AbstractController
         }
 
 
-        $cmission = $this->em->getRepository(ControlMission::class)->findOneBy(['id' =>  $dataRequest['idControl']]);
+        $control_mission = $this->em->getRepository(ControlMission::class)->findOneBy(['id' =>  $dataRequest['idControl']]);
 
-        $cmission->setDateEnd(new \DateTime());
-        $cmission->setStatus(1);
-        $this->em->persist($cmission);
+        $control_mission->setDateEnd(new \DateTime());
+        $control_mission->setStatus(2);
+        $this->em->persist($control_mission);
         $this->em->flush();
 
 
@@ -107,10 +108,10 @@ class CTerrainController extends AbstractController
         }
 
 
-        $cmission = $this->em->getRepository(ControlMission::class)->findOneBy(['id' =>  $dataRequest['idControl']]);
+        $control_mission = $this->em->getRepository(ControlMission::class)->findOneBy(['id' =>  $dataRequest['idControl']]);
 
-        $cmission->setNote(new \DateTime());
-        $this->em->persist($cmission);
+        $control_mission->setNote($dataRequest['note']);
+        $this->em->persist($control_mission);
         $this->em->flush();
 
 
@@ -125,23 +126,24 @@ class CTerrainController extends AbstractController
     public function
     ListMissionCTerrain(Request $request)
     {
-        if (empty($dataRequest['keySecretCterrain'])) {
+        if (empty($request->get('keySecretCterrain'))) {
 
             return new JsonResponse([
                 'message' => 'Veuillez reessayer'
             ], 203);
         }
-        $Cterrain = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' =>  $dataRequest['keySecretCterrain']]);
+        $Cterrain = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' => $request->get('keySecretCterrain')]);
 
-        $cmission = $this->em->getRepository(ControlMission::class)->findBy(['Cterrain' => $Cterrain, 'dateStart' => null, 'dateEnd' => null, 'status' => 0]);
+        $control_mission = $this->em->getRepository(ControlMission::class)->findBy(['CTerrain' => $Cterrain, 'status' => 0]);
 
         return new JsonResponse([
+
             'data' =>
 
             array_map(function (ControlMission $da) {
 
                 return   $this->myFunction->formatMissionControl($da);
-            }, $cmission)
+            }, $control_mission)
         ], 200);
     }
 
@@ -151,22 +153,22 @@ class CTerrainController extends AbstractController
     ListMissionCTerrainDone(Request $request)
     {
 
-        if (empty($dataRequest['keySecretCterrain'])) {
+        if (empty($request->get('keySecretCterrain'))) {
 
             return new JsonResponse([
                 'message' => 'Veuillez reessayer'
             ], 203);
         }
-        $Cterrain = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' =>  $dataRequest['keySecretCterrain']]);
+        $Cterrain = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' => $request->get('keySecretCterrain')]);
 
-        $cmission = $this->em->getRepository(ControlMission::class)->findBy(['Cterrain' => $Cterrain,  'status' => 1]);
+        $control_mission = $this->em->getRepository(ControlMission::class)->findBy(['CTerrain' => $Cterrain,  'status' => 2]);
 
         return new JsonResponse([
             'data'
             =>    array_map(function (ControlMission $da) {
 
                 return   $this->myFunction->formatMissionControl($da);
-            }, $cmission)
+            }, $control_mission)
         ], 200);
     }
 }

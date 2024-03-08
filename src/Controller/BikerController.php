@@ -145,9 +145,9 @@ class BikerController extends AbstractController
             'message' => 'Success',
         ], 201);
     }
-    #[Route('/biker/list-mission-session', name: 'ListMissionSession', methods: ['GET'])]
+    #[Route('/biker/list-mission-session', name: 'ListMissionSessionBiker', methods: ['GET'])]
     public function
-    ListMissionSession(Request $request)
+    ListMissionSessionBiker(Request $request)
     {
 
         $mission_id =
@@ -222,12 +222,16 @@ class BikerController extends AbstractController
             $request->get('keySecret');
         $biker  = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' => $keySecret]);
         $missionBiker = $this->em->getRepository(ListMissionBiker::class)->findBy(['biker' => $biker]);
-        if (!$missionBiker) {
+        if (!$biker) {
             return new JsonResponse([
                 'message' => 'Une erreur est survenue',
             ], 203);
         }
-
+        if (!$missionBiker) {
+            return new JsonResponse([
+                'data' => [],
+            ], 200);
+        }
         return new JsonResponse(
             [
                 'data'

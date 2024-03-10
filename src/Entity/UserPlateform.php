@@ -128,6 +128,9 @@ class UserPlateform implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'biker', targetEntity: InfoBiker::class)]
     private Collection $infoBikers;
 
+    #[ORM\OneToMany(mappedBy: 'biker', targetEntity: DisponibiliteBiker::class)]
+    private Collection $disponibiliteBikers;
+
     public function __construct()
     {
 
@@ -137,6 +140,7 @@ class UserPlateform implements UserInterface, PasswordAuthenticatedUserInterface
         $this->listMissionBikers = new ArrayCollection();
         $this->controlMissions = new ArrayCollection();
         $this->infoBikers = new ArrayCollection();
+        $this->disponibiliteBikers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -459,5 +463,58 @@ class UserPlateform implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, DisponibiliteBiker>
+     */
+    public function getDisponibiliteBikers(): Collection
+    {
+        return $this->disponibiliteBikers;
+    }
+
+    public function addDisponibiliteBiker(DisponibiliteBiker $disponibiliteBiker): static
+    {
+        if (!$this->disponibiliteBikers->contains($disponibiliteBiker)) {
+            $this->disponibiliteBikers->add($disponibiliteBiker);
+            $disponibiliteBiker->setBiker($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDisponibiliteBiker(DisponibiliteBiker $disponibiliteBiker): static
+    {
+        if ($this->disponibiliteBikers->removeElement($disponibiliteBiker)) {
+            // set the owning side to null (unless already changed)
+            if ($disponibiliteBiker->getBiker() === $this) {
+                $disponibiliteBiker->setBiker(null);
+            }
+        }
+
+        return $this;
+    } // Dans UserPlateform
+
+    /**
+     * Récupère le statut de la dernière disponibilité du biker.
+     * 
+     * @return bool Le statut de la dernière disponibilité, ou false si aucune disponibilité n'existe.
+     */
+    public function getLastDisponibiliteStatus(): bool
+    {
+        if ($this->disponibiliteBikers->isEmpty()) {
+            return false;
+        }
+
+        // Convertir la collection en tableau
+        $disponibilites = $this->disponibiliteBikers->toArray();
+
+        // Trier le tableau par date de début décroissante (vous devrez peut-être ajuster ce code si votre entité utilise un champ différent pour la date)
+        usort($disponibilites, function ($a, $b) {
+            return $b->getStart() <=> $a->getStart();
+        });
+
+        // Retourner le statut de la première disponibilité dans le tableau trié
+        return $disponibilites[0]->isStatus();
     }
 }

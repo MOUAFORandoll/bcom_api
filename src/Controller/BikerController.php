@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Category;
+use App\Entity\DisponibiliteBiker;
 use App\Entity\ListMissionBiker;
 use App\Entity\Medicament;
 use App\Entity\MedicamentObject;
@@ -39,6 +40,11 @@ use DateTime;
 use Dompdf\Dompdf;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mime\Email;
 
 class BikerController extends AbstractController
 {
@@ -66,6 +72,145 @@ class BikerController extends AbstractController
         $this->clientWeb = $clientWeb;
         $this->paginator = $paginator;
     }
+
+    #[Route('/biker/demande', name: 'sendEmailDemande', methods: ['GET'])]
+    public function sendEmailDemande(Request $request)
+    {
+        $keySecret = $request->get('keySecret');
+
+        if (empty($keySecret)) {
+            return new JsonResponse([
+                'message' => 'Veuillez recharger la page et reessayer '
+            ], 203);
+        }
+        $transport = Transport::fromDsn('smtp://admin@bcom.cm:NFju6%rwA33c@mx-dc03.ewodi.net:465/?timeout=60&encryption=ENCRYPTION_SMTPS&auth_mode=AUTH_MODE');
+        $mailer = new Mailer($transport);
+        $biker  = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' => $keySecret]);
+        if (!$biker) {
+            return new JsonResponse([
+                'data'
+                => [],
+                'message' => 'Action impossible'
+            ], 203);
+        }
+        $email = (new Email())
+            ->from(new Address('admin@bcom.cm'))
+            ->to(new Address('hari.randoll@gmail.com'))
+            ->subject('Demande de mission')
+            ->html("<p>Le biker {$biker->getNomComplet()} demande que vous lui attribuez une mission le plutot possible</p>");
+
+        $mailer->send($email);
+        return new JsonResponse(['message' => 'Success'], 200);
+    }
+    #[Route('/biker/start-disponibilite', name: 'StartDisponibiliteBiker', methods: ['POST'])]
+    public function
+    StartDisponibiliteBiker(Request $request)
+    {
+
+        $dataRequest = $request->toArray();
+
+        $keySecret =
+            $dataRequest['keySecret'];
+        $long =
+            $dataRequest['long'];
+        $lat =
+            $dataRequest['lat'];
+        $biker  = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' => $keySecret]);
+        if (!$biker) {
+            return new JsonResponse([
+                'data'
+                => [],
+                'message' => 'Action impossible'
+            ], 203);
+        }
+        $ms = new DisponibiliteBiker();
+        $ms->setBiker($biker);
+        $ms->setLong($long);
+        $ms->setLat($lat);
+
+        $this->em->persist($ms);
+        $this->em->flush();
+        $profile      = count($biker->getUserObjects())  == 0 ? '' : $biker->getUserObjects()->last()->getSrc();
+        // $biker->getUserObjects()[count($biker->getUserObjects()) - 1]->getSrc();
+        $bikerU = [
+            'id' => $biker->getId(),
+            'nom' => $biker->getNom(), 'prenom' => $biker->getPrenom(),
+            'email' => $biker->getEmail() ?? '', 'phone' => $biker->getPhone(),
+            'status' => $biker->isStatus(),
+            'disponibilite' => $biker->getLastDisponibiliteStatus(),
+            'typeUser' => $biker->getTypeUser()->getId(),
+            'infoComplete' => $biker->getTypeUser()->getId() == 4 ? count($biker->getInfoBikers()) != 0 : true,
+            'profile' => $this->myFunction::BACK_END_URL . '/images/users/' . $profile,
+
+
+            'date_created' => date_format($biker->getDateCreated(), 'Y-m-d H:i'),
+
+        ];
+
+
+
+        return new JsonResponse([
+            // 'status' => 'ok',
+            'data' =>  $bikerU,
+            'message' => 'Vous etes pret a biker'
+        ], 201);
+    }
+
+    #[Route('/biker/end-disponibilite', name: 'EndDisponibiliteBiker', methods: ['POST'])]
+    public function
+    EndDisponibiliteBiker(Request $request)
+    {
+
+        $dataRequest = $request->toArray();
+
+        $keySecret =
+            $dataRequest['keySecret'];
+        $biker  = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' => $keySecret]);
+        if (!$biker) {
+            return new JsonResponse([
+                'data'
+                => [],
+                'message' => 'Action impossible'
+            ], 203);
+        }
+        $ms = $this->em->getRepository(DisponibiliteBiker::class)->findLatestActiveByBiker($biker);
+
+        if (!$ms) {
+            return new JsonResponse(['message' => 'Aucune disponibilité active trouvée pour le biker.'], 404);
+        }
+
+        $ms->setStatus(false);
+
+        $ms->setEndDispo(new DateTime());
+        $this->em->persist($ms);
+        $this->em->flush();
+        $profile      = count($biker->getUserObjects())  == 0 ? '' : $biker->getUserObjects()->last()->getSrc();
+        $bikerU = [
+            'id' => $biker->getId(),
+            'nom' => $biker->getNom(), 'prenom' => $biker->getPrenom(),
+            'email' => $biker->getEmail() ?? '', 'phone' => $biker->getPhone(),
+            'status' => $biker->isStatus(),
+            'disponibilite' => $biker->getLastDisponibiliteStatus(),
+            'typeUser' => $biker->getTypeUser()->getId(),
+            'infoComplete' => $biker->getTypeUser()->getId() == 4 ? count($biker->getInfoBikers()) != 0 : true,
+            'profile' => $this->myFunction::BACK_END_URL . '/images/users/' . $profile,
+
+
+            'date_created' => date_format($biker->getDateCreated(), 'Y-m-d H:i'),
+
+        ];
+
+
+
+        return new JsonResponse([
+            // 'status' => 'ok',
+            'data' =>  $bikerU,
+            'message' => 'Success',
+        ], 201);
+    }
+
+
+
 
     #[Route('/biker/start-mission', name: 'StartMissionBiker', methods: ['POST'])]
     public function

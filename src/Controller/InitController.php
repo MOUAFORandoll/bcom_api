@@ -13,19 +13,29 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mime\Email;
 
 class InitController extends AbstractController
 {
     private $em;
+    private $mailer;
     private $publicDirectory;
     private $transactionFunction;
     public function __construct(
         EntityManagerInterface $em,
         ParameterBagInterface $params,
+        MailerInterface $mailer
     ) {
         $this->em = $em;
         $this->publicDirectory = $params->get('kernel.project_dir') . '/public';
+
+        $this->mailer = $mailer;
     }
+
 
     #[Route('/bcom/config', name: 'InitConfig', methods: ['GET'])]
     public function initConfig()
@@ -121,6 +131,22 @@ class InitController extends AbstractController
             $this->em->flush();
         }
 
+        return new JsonResponse(['message' => 'Success'], 200);
+    }
+
+    #[Route('/mail', name: 'sendEmail', methods: ['GET'])]
+    public function sendEmail()
+    {
+        $transport = Transport::fromDsn('smtp://admin@bcom.cm:NFju6%rwA33c@mx-dc03.ewodi.net:465/?timeout=60&encryption=ENCRYPTION_SMTPS&auth_mode=AUTH_MODE');
+        $mailer = new Mailer($transport);
+        $email = (new Email())
+            ->from(new Address('admin@bcom.cm'))
+            ->to(new Address('hari.randoll@gmail.com'))
+            ->subject('Time for Symfony Mailer!')
+            ->text('Sending emails is fun again!')
+            ->html('<p>See Twig integration for better HTML integration!</p>');
+
+        $mailer->send($email);
         return new JsonResponse(['message' => 'Success'], 200);
     }
 }

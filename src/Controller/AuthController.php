@@ -349,6 +349,7 @@ class AuthController extends AbstractController
             'nom' => $user->getNom(), 'prenom' => $user->getPrenom(),
             'email' => $user->getEmail() ?? '', 'phone' => $user->getPhone(),
             'status' => $user->isStatus(),
+            'disponibilite' => $user->getLastDisponibiliteStatus(),
             'typeUser' => $user->getTypeUser()->getId(),
             'infoComplete' => $user->getTypeUser()->getId() == 4 ? count($user->getInfoBikers()) != 0 : true,
             'profile' => $this->myFunction::BACK_END_URL . '/images/users/' . $profile,
@@ -739,66 +740,65 @@ class AuthController extends AbstractController
             ], 203);
         }
         $userUser = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' => $data['keySecret']]);
-        if ($userUser) {
-            $list_users_final = [];
+        if (!$userUser) {
+            return new JsonResponse([
+                'data'
+                => [],
+                'message' => 'Action impossible'
+            ], 200);
+        }
+        $list_users_final = [];
 
-            /**
-             * si il a le role admin
-             */
-            if ($userUser->getTypeUser()->getId() == 1) {
-                $luser = $this->em->getRepository(UserPlateform::class)->findAll();
+        /**
+         * si il a le role admin
+         */
+        if ($userUser->getTypeUser()->getId() == 1) {
+            $luser = $this->em->getRepository(UserPlateform::class)->findAll();
 
-                foreach ($luser as $user) {
-                    if ($user->getTypeUser()->getId() == 1) {
-                        $localisation = $user->getLocalisations()[count($user->getLocalisations()) - 1];
-                        $userU        = [
-                            'id' => $user->getId(),
-                            'nom' => $user->getNom(), 'prenom' => $user->getPrenom(),
-                            'email' => $user->getEmail(), 'phone' => $user->getPhone(),
-                            'status' => $user->isStatus(),
-                            'typeUser' => $user->getTypeUser()->getId(),
-                            'date_created' => date_format($user->getDateCreated(), 'Y-m-d H:i'),
+            foreach ($luser as $user) {
+                if ($user->getTypeUser()->getId() == 1) {
+                    $localisation = $user->getLocalisations()[count($user->getLocalisations()) - 1];
+                    $userU        = [
+                        'id' => $user->getId(),
+                        'nom' => $user->getNom(), 'prenom' => $user->getPrenom(),
+                        'email' => $user->getEmail(), 'phone' => $user->getPhone(),
+                        'status' => $user->isStatus(),
+                        'typeUser' => $user->getTypeUser()->getId(),
+                        'date_created' => date_format($user->getDateCreated(), 'Y-m-d H:i'),
 
-                            'localisation' => $localisation ? [
-                                'ville' =>
-                                $localisation->getVille(),
+                        'localisation' => $localisation ? [
+                            'ville' =>
+                            $localisation->getVille(),
 
-                                'longitude' =>
-                                $localisation->getLongitude(),
-                                'latitude' =>
-                                $localisation->getLatitude(),
-                            ] : [
-                                'ville' =>
-                                'Aucune',
+                            'longitude' =>
+                            $localisation->getLongitude(),
+                            'latitude' =>
+                            $localisation->getLatitude(),
+                        ] : [
+                            'ville' =>
+                            'Aucune',
 
-                                'longitude' =>
-                                0,
-                                'latitude' =>
-                                0,
-                            ]
-                            // 'nom' => $user->getNom()
-                        ];
+                            'longitude' =>
+                            0,
+                            'latitude' =>
+                            0,
+                        ]
+                        // 'nom' => $user->getNom()
+                    ];
 
-                        $list_users_final[] = $userU;
-                    } else {
-                    }
+                    $list_users_final[] = $userU;
+                } else {
                 }
-                $datas
-                    = $this->serializer->serialize(array_reverse($list_users_final), 'json');
-                return
-                    new JsonResponse([
-                        'data'
-                        =>
-                        JSON_DECODE($datas),
-
-                    ], 200);
-            } else {
-                return new JsonResponse([
-                    'data'
-                    => [],
-                    'message' => 'Action impossible'
-                ], 200);
             }
+            $datas
+                = $this->serializer->serialize(array_reverse($list_users_final), 'json');
+            return
+                new JsonResponse([
+                    'data'
+                    =>
+                    JSON_DECODE($datas),
+
+                ], 200);
         } else {
             return new JsonResponse([
                 'data'

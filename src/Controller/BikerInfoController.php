@@ -131,6 +131,7 @@ class BikerInfoController extends AbstractController
         $infoBiker->setNumCarteGriseMoto($data['num_carte_grise_moto']);
         $infoBiker->setBikeWorkTime($data['bike_work_time']);
         $infoBiker->setBiker($user);
+        $infoBiker->setNumBadge($this->getUniqueNumBagde($entityManager->getRepository(InfoBikerRepository::class)));
 
 
 
@@ -164,6 +165,7 @@ class BikerInfoController extends AbstractController
             'typeUser' => $user->getTypeUser()->getId(),
             'infoComplete' => $user->getTypeUser()->getId() == 4 ? count($user->getInfoBikers()) != 0 : true,
             'profile' => $this->myFunction::BACK_END_URL . '/images/users/' . $profile,
+            'disponibilite' => $user->getLastDisponibiliteStatus(),
 
 
             'date_created' => date_format($user->getDateCreated(), 'Y-m-d H:i'),
@@ -177,6 +179,24 @@ class BikerInfoController extends AbstractController
 
         ], 201);
     }
+    public function getUniqueNumBagde(InfoBikerRepository $infoBikerRepository)
+    {
+        // Récupère tous les InfoBikers
+        $infoBikers = $infoBikerRepository->findAll();
+
+        if (!$infoBikers) {
+            return '000001';
+        }
+
+        $lastInfoBiker = end($infoBikers);
+
+        $lastNumBadge = $lastInfoBiker->getNumBadge();
+        $newNumBadge = str_pad(intval($lastNumBadge) + 1, 6, '0', STR_PAD_LEFT);
+
+        return $newNumBadge;
+    }
+
+
     public function updateFile($type, $file, $slugger)
     {
         $object = null;

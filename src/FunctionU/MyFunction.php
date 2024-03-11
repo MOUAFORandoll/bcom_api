@@ -14,6 +14,7 @@ use App\Entity\MissionSession;
 use App\Entity\ObjectFile;
 use App\Entity\Ordonnance;
 use App\Entity\Pharmacie;
+use App\Entity\Secteur;
 use App\Entity\UserObject;
 use App\Entity\UserPlateform;
 use Doctrine\ORM\EntityManagerInterface;
@@ -232,21 +233,50 @@ class MyFunction
     }
     function formatMissionControl(ControlMission $da)
     {
+        // $secteur = $da->getSecteur();
+        // if ($secteur === null) {
+        //     $missionSessions = null;
+        //     $lastMissionSession = null;
+        // } else {
+        //     $missionSessions = $secteur->getMissionSessions();
+        //     $lastMissionSession = $missionSessions->last();
+        // }
+        // dd(
+        //     $lastMissionSession 
+        // );
+        // $missionForUser = null;
+        // if ($lastMissionSession !== false && $lastMissionSession !== null) {
+
+
+        //     $missionBiker = $lastMissionSession->getMissionbiker();
+        //     if ($missionBiker !== null) {
+        //         $missionForUser = $this->formatMissionForUser($missionBiker);
+        //     }
+        // }
+
+        return
+            [
+                'id' => $da->getId(),
+                'status' => $da->isStatus(),
+                'mission'
+                =>  $this->formatMission($da->getMission()),
+                'secteur' =>  $this->formatSecteur($da->getSecteur()),
+                'controller' => $this->formatBikerOrController($da->getCTerrain()),
+                'date_created' => date_format($da->getDateCreated(), 'Y-m-d H:i'),
+                'date_end' => $da->getDateEnd() === null ? null : date_format($da->getDateEnd(), 'Y-m-d H:i'),
+                'date_start' => $da->getDateStart() === null ? null : date_format($da->getDateStart(), 'Y-m-d H:i'),
+            ];
+    }
+    function formatSecteur(Secteur $da)
+    {
 
         return  [
 
             'id' => $da->getId(),
-            'status' => $da->isStatus(),
-            'note' => $da->getNote(),
-            'mission' => $this->formatMissionForUser($da->getBikerMission()->getMissionbiker()),
-            'biker' => $this->formatBikerOrController($da->getBikerMission()->getMissionbiker()->getBiker()),
-            'controller' => $this->formatBikerOrController($da->getCTerrain()),
-            'date_created' =>
-            date_format($da->getDateCreated(), 'Y-m-d H:i'),
-            'biker_position' => $da->getBikerMission()->getMissionbiker()->getMissionSessions()->last()->getPointLocalisations(),
-            'date_end' => $da->getDateEnd() == null ? null :
-                date_format($da->getDateEnd(), 'Y-m-d H:i'),   'date_start' => $da->getDateStart() == null ? null :
-                date_format($da->getDateStart(), 'Y-m-d H:i'),
+
+            'libelle' =>
+            $da->getLibelle()
+
         ];
     }
     function formatMissionSession(MissionSession $da)

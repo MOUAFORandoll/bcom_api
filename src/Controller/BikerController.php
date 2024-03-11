@@ -15,6 +15,7 @@ use App\Entity\MissionSession;
 use App\Entity\Ordonnance;
 use App\Entity\OrdonnanceMedicament;
 use App\Entity\PointLocalisation;
+use App\Entity\Secteur;
 use App\Entity\Service;
 use App\Entity\UserPlateform;
 use App\Entity\Ville;
@@ -221,6 +222,9 @@ class BikerController extends AbstractController
         $mission_id =
             $dataRequest['mission_id'];
         $mission  = $this->em->getRepository(Mission::class)->findOneBy(['id' => $mission_id]);
+        $secteur_id =
+            $dataRequest['secteur_id'];
+        $secteur  = $this->em->getRepository(Secteur::class)->findOneBy(['id' => $secteur_id]);
         $keySecret =
             $dataRequest['keySecret'];
         $biker  = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' => $keySecret]);
@@ -230,8 +234,14 @@ class BikerController extends AbstractController
                 'message' => 'Une erreur est survenue',
             ], 203);
         }
+        if (!$secteur) {
+            return new JsonResponse([
+                'message' => 'Une erreur est survenue',
+            ], 203);
+        }
         $ms = new MissionSession();
         $ms->setMissionbiker($missionBiker);
+        $ms->setSecteur($secteur);
 
         $this->em->persist($ms);
         $this->em->flush();

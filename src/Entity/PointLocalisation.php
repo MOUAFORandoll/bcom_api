@@ -6,6 +6,7 @@ use App\Repository\PointLocalisationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\DBAL\Types\Types;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -33,7 +34,7 @@ class PointLocalisation
     #[ORM\Column(nullable: true)]
     private ?float $latitude = null;
 
-    #[ORM\Column(type: "date")]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private $date_created;
 
     #[ORM\ManyToOne(inversedBy: 'pointLocalisations')]

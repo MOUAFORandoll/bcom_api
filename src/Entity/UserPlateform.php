@@ -100,7 +100,7 @@ class UserPlateform implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(["create:user"])]
     private $typeUser;
 
-    #[ORM\Column(type: "date")]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private $date_created;
 
 

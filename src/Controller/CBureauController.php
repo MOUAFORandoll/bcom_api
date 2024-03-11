@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Medicament;
 use App\Entity\Mission;
 use App\Entity\MissionSession;
+use App\Entity\Secteur;
 use App\Entity\TypeUser;
 use App\Entity\UserPlateform;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -173,7 +174,7 @@ class CBureauController extends AbstractController
         $dataRequest = $request->toArray();
 
 
-        if (empty($dataRequest['keySecretCbureau']) || empty($dataRequest['keySecretCterrain']) || empty($dataRequest['idMissionSession'])) {
+        if (empty($dataRequest['keySecretCbureau']) || empty($dataRequest['keySecretCterrain']) || empty($dataRequest['idSecteur'])) {
 
             return new JsonResponse([
                 'message' => 'Veuillez reessayer'
@@ -183,14 +184,16 @@ class CBureauController extends AbstractController
 
         $Cbureau = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' =>  $dataRequest['keySecretCbureau']]);
         $Cterrain = $this->em->getRepository(UserPlateform::class)->findOneBy(['keySecret' =>  $dataRequest['keySecretCterrain']]);
-        $missionSave = $this->em->getRepository(MissionSession::class)->findOneBy(['id' =>  $dataRequest['idMissionSession']]);
+        $secteur = $this->em->getRepository(Secteur::class)->findOneBy(['id' =>  $dataRequest['idSecteur']]);
+        $mission = $this->em->getRepository(Mission::class)->findOneBy(['id' =>  $dataRequest['idMission']]);
 
         $cmission = new ControlMission();
         $cmission->setCTerrain($Cterrain);
         $cmission->setCBureau(
             $Cbureau
         );
-        $cmission->setBikerMission($missionSave);
+        $cmission->setSecteur($secteur);
+        $cmission->setMission($mission);
         $this->em->persist($cmission);
         $this->em->flush();
 

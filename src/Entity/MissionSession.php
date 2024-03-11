@@ -37,6 +37,12 @@ class MissionSession
 
     #[ORM\OneToMany(mappedBy: 'biker_mission', targetEntity: ControlMission::class)]
     private Collection $controlMissions;
+
+    #[ORM\ManyToOne(inversedBy: 'missionSessions')]
+    private ?Secteur $secteur = null;
+
+    #[ORM\OneToMany(mappedBy: 'missionSession', targetEntity: NotationBiker::class)]
+    private Collection $notationBikers;
     public function __construct()
     {
 
@@ -46,6 +52,7 @@ class MissionSession
 
         $this->pointLocalisations = new ArrayCollection();
         $this->controlMissions = new ArrayCollection();
+        $this->notationBikers = new ArrayCollection();
     }
     public function getId(): ?int
     {
@@ -143,30 +150,43 @@ class MissionSession
         return $this;
     }
 
-    /**
-     * @return Collection<int, ControlMission>
-     */
-    public function getControlMissions(): Collection
+
+    public function getSecteur(): ?Secteur
     {
-        return $this->controlMissions;
+        return $this->secteur;
     }
 
-    public function addControlMission(ControlMission $controlMission): static
+    public function setSecteur(?Secteur $secteur): static
     {
-        if (!$this->controlMissions->contains($controlMission)) {
-            $this->controlMissions->add($controlMission);
-            $controlMission->setBikerMission($this);
+        $this->secteur = $secteur;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, NotationBiker>
+     */
+    public function getNotationBikers(): Collection
+    {
+        return $this->notationBikers;
+    }
+
+    public function addNotationBiker(NotationBiker $notationBiker): static
+    {
+        if (!$this->notationBikers->contains($notationBiker)) {
+            $this->notationBikers->add($notationBiker);
+            $notationBiker->setMissionSession($this);
         }
 
         return $this;
     }
 
-    public function removeControlMission(ControlMission $controlMission): static
+    public function removeNotationBiker(NotationBiker $notationBiker): static
     {
-        if ($this->controlMissions->removeElement($controlMission)) {
+        if ($this->notationBikers->removeElement($notationBiker)) {
             // set the owning side to null (unless already changed)
-            if ($controlMission->getBikerMission() === $this) {
-                $controlMission->setBikerMission(null);
+            if ($notationBiker->getMissionSession() === $this) {
+                $notationBiker->setMissionSession(null);
             }
         }
 

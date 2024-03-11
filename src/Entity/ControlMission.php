@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ControlMissionRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -30,18 +32,23 @@ class ControlMission
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateEnd = null;
 
-    #[ORM\ManyToOne(inversedBy: 'controlMissions')]
-    private ?MissionSession $biker_mission = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?float $note = null;
-    #[ORM\Column(type: "date")]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private $date_created;
+
+    #[ORM\ManyToOne(inversedBy: 'controlMissions')]
+    private ?Secteur $secteur = null;
+
+    #[ORM\ManyToOne(inversedBy: 'controlMissions')]
+    private ?Mission $mission = null;
+
+    #[ORM\OneToMany(mappedBy: 'controlMission', targetEntity: NotationBiker::class)]
+    private Collection $notationBikers;
     public function __construct()
     {
         $this->date_created = new \DateTime();
 
         $this->status = 0;
+        $this->notationBikers = new ArrayCollection();
     }
     public function getId(): ?int
     {
@@ -109,17 +116,6 @@ class ControlMission
         return $this;
     }
 
-    public function getBikerMission(): ?MissionSession
-    {
-        return $this->biker_mission;
-    }
-
-    public function setBikerMission(?MissionSession $biker_mission): static
-    {
-        $this->biker_mission = $biker_mission;
-
-        return $this;
-    }
 
     public function getDateCreated(): ?\DateTimeInterface
     {
@@ -132,14 +128,57 @@ class ControlMission
 
         return $this;
     }
-    public function getNote(): ?float
+
+    public function getSecteur(): ?Secteur
     {
-        return $this->note;
+        return $this->secteur;
     }
 
-    public function setNote(float $note): static
+    public function setSecteur(?Secteur $secteur): static
     {
-        $this->note = $note;
+        $this->secteur = $secteur;
+
+        return $this;
+    }
+
+    public function getMission(): ?Mission
+    {
+        return $this->mission;
+    }
+
+    public function setMission(?Mission $mission): static
+    {
+        $this->mission = $mission;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, NotationBiker>
+     */
+    public function getNotationBikers(): Collection
+    {
+        return $this->notationBikers;
+    }
+
+    public function addNotationBiker(NotationBiker $notationBiker): static
+    {
+        if (!$this->notationBikers->contains($notationBiker)) {
+            $this->notationBikers->add($notationBiker);
+            $notationBiker->setControlMission($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNotationBiker(NotationBiker $notationBiker): static
+    {
+        if ($this->notationBikers->removeElement($notationBiker)) {
+            // set the owning side to null (unless already changed)
+            if ($notationBiker->getControlMission() === $this) {
+                $notationBiker->setControlMission(null);
+            }
+        }
 
         return $this;
     }

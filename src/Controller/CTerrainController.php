@@ -3,7 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\ControlMission;
+use App\Entity\InfoBiker;
+use App\Entity\ListMissionBiker;
 use App\Entity\MedicamentPharmacie;
+use App\Entity\NotationBiker;
 use App\Entity\UserPlateform;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -100,7 +103,7 @@ class CTerrainController extends AbstractController
     {
         $dataRequest = $request->toArray();
 
-        if (empty($dataRequest['idControl'])) {
+        if (empty($dataRequest['num_badge']) || empty($dataRequest['idControl']) || empty($dataRequest['note'])) {
 
             return new JsonResponse([
                 'message' => 'Veuillez reessayer'
@@ -108,17 +111,57 @@ class CTerrainController extends AbstractController
         }
 
 
-        $control_mission = $this->em->getRepository(ControlMission::class)->findOneBy(['id' =>  $dataRequest['idControl']]);
+        $idControl =  $dataRequest['idControl'];
+        $badge =  $dataRequest['num_badge'];
+        $note =  $dataRequest['note'];
+        $infoBiker = $this->em->getRepository(InfoBiker::class)->findOneBy(['num_badge' => $badge]);
+        if (!$infoBiker) {
 
-        $control_mission->setNote($dataRequest['note']);
-        $this->em->persist($control_mission);
-        $this->em->flush();
+            return new JsonResponse([
+                'message' => 'Veuillez reessayer'
+            ], 203);
+        }
+        $biker
+            =  $infoBiker->getBiker();
+        $control_mission = $this->em->getRepository(ControlMission::class)->findOneBy(['id' => $idControl]);
+        if (!$control_mission) {
+            return new JsonResponse([
+                'message' => 'Veuillez reessayer'
+            ], 203);
+        }
+        $lmb = $this->em->getRepository(ListMissionBiker::class)->findOneBy(['mission' => $control_mission->getMission(), 'biker' => $biker]);
+        if (!$lmb) {
+            return new JsonResponse([
+                'message'
+                => 'Veuillez reessayer'
+            ], 203);
+        }
+        $missionSessionS =
+            $lmb->getMissionSessions();
+
+        if ($missionSessionS === null) {
+            return new JsonResponse([
+                'message' => 'Veuillez44 reessayer'
+            ], 203);
+        } else {
+
+            $missionSession =
+                $missionSessionS->last();
+
+
+            $newNotation = new NotationBiker();
+            $newNotation->setControlMission($control_mission);
+            $newNotation->setMissionSession($missionSession);
+            $newNotation->setNote($note);
+            $this->em->persist($newNotation);
+            $this->em->flush();
 
 
 
-        return new JsonResponse([
-            'message' => 'Success',
-        ], 201);
+            return new JsonResponse([
+                'message' => 'Success',
+            ], 201);
+        }
     }
 
 

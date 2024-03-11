@@ -64,6 +64,9 @@ class InfoBiker
     #[ORM\ManyToOne(inversedBy: 'infoBikers')]
     private ?ObjectFile $carteGrise = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $num_badge = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -268,6 +271,18 @@ class InfoBiker
     public function setCarteGrise(?ObjectFile $carteGrise): static
     {
         $this->carteGrise = $carteGrise;
+
+        return $this;
+    }
+
+    public function getNumBadge(): ?string
+    {
+        return $this->num_badge;
+    }
+
+    public function setNumBadge(string $num_badge): static
+    {
+        $this->num_badge = $num_badge;
 
         return $this;
     }

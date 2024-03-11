@@ -37,12 +37,16 @@ class Mission
     #[ORM\Column(length: 255)]
     private ?string $nbre_point = null;
 
+    #[ORM\OneToMany(mappedBy: 'mission', targetEntity: ControlMission::class)]
+    private Collection $controlMissions;
+
     public function __construct()
     {
         $this->status = true;
 
         $this->date_created = new \DateTime();
         $this->listMissionBikers = new ArrayCollection();
+        $this->controlMissions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -136,6 +140,36 @@ class Mission
     public function setNbrePoint(string $nbre_point): static
     {
         $this->nbre_point = $nbre_point;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ControlMission>
+     */
+    public function getControlMissions(): Collection
+    {
+        return $this->controlMissions;
+    }
+
+    public function addControlMission(ControlMission $controlMission): static
+    {
+        if (!$this->controlMissions->contains($controlMission)) {
+            $this->controlMissions->add($controlMission);
+            $controlMission->setMission($this);
+        }
+
+        return $this;
+    }
+
+    public function removeControlMission(ControlMission $controlMission): static
+    {
+        if ($this->controlMissions->removeElement($controlMission)) {
+            // set the owning side to null (unless already changed)
+            if ($controlMission->getMission() === $this) {
+                $controlMission->setMission(null);
+            }
+        }
 
         return $this;
     }

@@ -131,7 +131,7 @@ class BikerInfoController extends AbstractController
         $infoBiker->setNumCarteGriseMoto($data['num_carte_grise_moto']);
         $infoBiker->setBikeWorkTime($data['bike_work_time']);
         $infoBiker->setBiker($user);
-        $infoBiker->setNumBadge($this->getUniqueNumBagde($entityManager->getRepository(InfoBikerRepository::class)));
+        $infoBiker->setNumBadge($this->getUniqueNumBagde($entityManager->getRepository(InfoBiker::class)));
 
 
 
